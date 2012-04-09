@@ -38,7 +38,7 @@ class Sphere(object):
         if discriminant < 0:
             return None
         else:
-            return (v - math.sqrt(discriminant), self)
+            return v - math.sqrt(discriminant)
 
     # returns color of the sphere
     def getColor(self):

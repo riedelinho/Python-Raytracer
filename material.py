@@ -25,12 +25,11 @@ class Color(object):
 # Class for the material of the object
 class Material(object):
   
-  def __init__(self, _ambient, _diffus, _specular, _glossiness, _color):
+  def __init__(self, _ambient, _diffus, _specular, _n, _color):
     self.ambient = _ambient
     self.diffus = _diffus
     self.specular = _specular
-    self.glossiness = _glossiness
-    self.n = int(64 * self.glossiness - 1)
+    self.n = _n
     self.color = _color
   
   # calculates color of point on object
@@ -38,9 +37,9 @@ class Material(object):
   # more datails: Folie 2 Seite 18
   def calculateColor(self, directionToLight, normal, lightIntensity, rayToPoint):
     
-    ambientPart = self.color * self.ambient
+    #ambientPart = self.color * self.ambient
     diffusPart = self.color * (self.diffus * directionToLight.normalized().dot(normal.normalized())) * lightIntensity
     specularPart = self.color * ((self.n+2)/(2*math.pi)) * (directionToLight.normalized().reflect(normal.normalized()).dot(rayToPoint.direction.normalized() * -1)**self.n * self.specular) * lightIntensity
     
-    colorout = ambientPart + diffusPart + specularPart
+    colorout = diffusPart + specularPart
     return colorout    

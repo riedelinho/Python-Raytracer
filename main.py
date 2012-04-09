@@ -77,7 +77,6 @@ class Raytracer(object):
 	  if hitdist:
 	    if hitdist < maxdist:
 	      maxdist = hitdist
-	      
 	      # Rest of objects
 	      otherobjects = self.objectlist[:]
 	      otherobjects.remove(obj)
@@ -85,21 +84,13 @@ class Raytracer(object):
 	      point = ray.pointAtParameter(hitdist)
 	      directionToLight = self.light.pos - point
 	      normal = obj.normalAt(point)
+	      color = obj.material.color * obj.material.ambient
 	      
-	      #if self.light.shadowHit(ray, hitdist, otherobjects):
-		#color = Color(128, 128, 128)
-	      #else:
+	      #if not self.light.shadowHit(ray, hitdist, otherobjects):
+		#color += obj.material.calculateColor(directionToLight, normal, 1, ray)
 	      color += obj.material.calculateColor(directionToLight, normal, self.light.intensity, ray)
-	      
-	      
-	      # reflektierendes objekt
-	      #reflectedRay = Ray(point, ray.direction.reflect(normal))
-	      #for reflectobj in otherobjects:
-		#(reflecthitdist, hitobj) = reflectobj.intersectionParameter(reflectedRay)
-		#if reflecthitdist:
-		  #reflectColor = reflectobj.material.color
-		  #color += reflectcolor
 	
+	#print color
 	image.putpixel((x,y), color.getTuple())
     print "...completed"
     image.save(imageName, imageFormat)
@@ -113,27 +104,7 @@ class Raytracer(object):
     return Ray(self.cam.e, self.cam.f + xcomp + ycomp)
     
 
-  def renderColor(self, maxdist, obj, ray):
-    
-    _maxdist = maxdist
-    hitdist = obj.intersectionParameter(ray)
-    
-    if hitdist:
-      if hitdist < _maxdist:
-	_maxdist = hitdist
-	
-	otherobjects = self.objectlist[:]
-	otherobjects.remove(obj)
-	
-	point = ray.pointAtParameter(hitdist)
-	directionToLight = self.light.pos - point
-	normal = obj.normalAt(point)
-	color = obj.material.color * obj.material.ambient
-	color += obj.material.calculateColor(directionToLight, normal, self.light.intensity, ray)
-    else:
-      color = BACKGROUND_COLOR
-      
-    return (color, _maxdist)
+
 
 if __name__=="__main__":
   
@@ -150,29 +121,29 @@ if __name__=="__main__":
   redcenter = Point(2.5, 3, -10)
   redradius = 1
   redcolor = Color(255, 0, 0)
-  redmaterial = Material(0.3, 0.8, 0.1, 0.05, redcolor)
+  redmaterial = Material(0.3, 0.8, 0.1, 4, redcolor)
   redsphere = Sphere(redcenter, redradius, redcolor, redmaterial)
   
   # Green sphere
   greencenter = Point(-2.5, 3, -10)
   greenradius = 1.5
   greencolor = Color(0, 255, 0)
-  greenmaterial = Material(0.3, 0.8, 0.1, 0.05, greencolor)
+  greenmaterial = Material(0.3, 0.8, 0.1, 4, greencolor)
   greensphere = Sphere(greencenter, greenradius, greencolor, greenmaterial)
   
   # Blue sphere
   bluecenter = Point(0,7,-10)
   blueradius = 2
   bluecolor = Color(0, 0, 255)
-  bluematerial = Material(0.3, 0.8, 0.1, 0.05, bluecolor)
+  bluematerial = Material(0.3, 0.8, 0.1, 4, bluecolor)
   bluesphere = Sphere(bluecenter, blueradius, bluecolor, bluematerial)
   
   # Gray Plane
-  #planepoint = Point(0, 0, 0)
-  #planenormal = Vector(10, 0, 0)
-  #planecolor = Color(128, 128, 128)
-  #planematerial = Material(1, 0.5, 0.5, 0.05, planecolor)
-  #plane = Plane(planepoint, planenormal, planecolor)
+  planepoint = Point(0, 0, 0)
+  planenormal = Vector(10, 0, 0)
+  planecolor = Color(128, 128, 128)
+  planematerial = Material(1, 0.5, 0.5, 13, planecolor)
+  plane = Plane(planepoint, planenormal, planecolor)
   
   # Yellow Triangle
   #yellowpoints = [Point(3, 2, 0), Point(3, 5, 0), Point(6, 4, 2)]
@@ -189,7 +160,7 @@ if __name__=="__main__":
   raytracer = Raytracer(cam, light)
   
   # Creating objects
-  #raytracer.addObj(plane)
+  raytracer.addObj(plane)
   raytracer.addObj(redsphere)
   raytracer.addObj(greensphere)
   raytracer.addObj(bluesphere)
